@@ -1,35 +1,22 @@
-import os, csv
+import csv
 from django.core.management.base import BaseCommand
 from app_factory.models import CementFactoryInfo, PriceHistoryInfo
+from django.utils.timezone import make_aware
 from datetime import datetime
-from django.utils import timezone
 
 class Command(BaseCommand):
-    help = "Bulk insert Price History for Sarbottam Cement Limited"
+    help = "Insert Sarbottam Cement price history"
 
     def handle(self, *args, **kwargs):
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(BASE_DIR, 'data/price_data.csv')
+        company = CementFactoryInfo.objects.filter(company_name="Sarbottam Cement Limited").first()
+        if not company:
+            print("Company not found"); return
 
-        try:
-            company = CementFactoryInfo.objects.get(company_name="Sarbottam Cement Limited")
-        except CementFactoryInfo.DoesNotExist:
-            print(" Company not found.")
-            return
-
-        with open(file_path, newline='') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                date = timezone.make_aware(datetime.strptime(row['Date'], "%Y-%m-%d"))
-                _, created = PriceHistoryInfo.objects.update_or_create(
-                    company=company,
-                    date=date,
-                    defaults={
-                        'open_price': float(row['Open']),
-                        'high_price': float(row['High']),
-                        'low_price': float(row['Low']),
-                        'close_price': float(row['Ltp']),
-                    }
+        with open("app_factory/management/commands/data/price_data.csv") as f:
+            for row in csv.DictReader(f):
+                date = make_aware(datetime.strptime(row['Date'], "%Y-%m-%d"))
+                obj, created = PriceHistoryInfo.objects.update_or_create(
+                    company=company, date=date,
+                    defaults={k: float(row[k]) for k in ['Open', 'High', 'Low', 'Ltp']}
                 )
-                status = "Inserted" if created else "Updated"
-                print(f"{status}: {date.date()}")
+                print(f"{'Inserted' if created else 'Updated'}: {date.date()}")

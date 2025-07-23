@@ -10,6 +10,8 @@ urlpatterns = [
     path('news-section-detail/<int:pk>/', views.NewsSection_Detail.as_view(), name="news-section-detail"),
 
     path('price-history-lc/',views.PriceHistory_LC.as_view(), name='price-history-lc'),
-    path('price-history-detail/<int:pk>/', views.PriceHistory_Detail.as_view(), name='price-history-detail')
+    path('price-history-detail/<int:pk>/', views.PriceHistory_Detail.as_view(), name='price-history-detail'),
+
+    path('predict/', views.predict_next_numbers, name='predict_next_numbers'),
 
 ]

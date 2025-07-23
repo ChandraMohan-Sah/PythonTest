@@ -1,59 +1,19 @@
 import numpy as np
-import torch
-import torch.nn as nn
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.linear_model import LinearRegression
 
-# LTP values
-ltp = np.array([
-    960.44, 892.88, 882.94, 895.22, 865.81,
-    864.39, 856.64, 867.38, 877.59, 870.61,
-    859.65, 850.54, 861.88, 848.50, 849.53,
-    845.49, 842.19, 831.35, 826.49, 826.84
-]).reshape(-1, 1)
+# Your given 20 numbers (example)
+data = [5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43]
 
-# Normalize
-scaler = MinMaxScaler()
-ltp_scaled = scaler.fit_transform(ltp)
+# Prepare features (indexes as x) and labels (actual values)
+X = np.arange(len(data)).reshape(-1, 1)  # [[0], [1], ..., [19]]
+y = np.array(data)
 
-# Create sequences
-def create_seq(data, seq_len=5):
-    X, y = [], []
-    for i in range(len(data) - seq_len):
-        X.append(data[i:i+seq_len])
-        y.append(data[i+seq_len])
-    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+# Train the model
+model = LinearRegression()
+model.fit(X, y)
 
-X, y = create_seq(ltp_scaled)
+# Predict next 5 steps: 20,21,22,23,24
+X_future = np.arange(len(data), len(data) + 5).reshape(-1, 1)
+predictions = model.predict(X_future)
 
-# LSTM model
-class LSTM(nn.Module):
-    def __init__(self): super().__init__()
-    self.lstm = nn.LSTM(1, 32, batch_first=True)
-    self.fc = nn.Linear(32, 1)
-    def forward(self, x): return self.fc(self.lstm(x)[0][:, -1, :])
-
-model = LSTM()
-opt = torch.optim.Adam(model.parameters(), lr=0.01)
-loss_fn = nn.MSELoss()
-
-# Train
-for _ in range(200):
-    out = model(X)
-    loss = loss_fn(out, y)
-    opt.zero_grad()
-    loss.backward()
-    opt.step()
-
-# Predict next 5
-seq = torch.tensor(ltp_scaled[-5:], dtype=torch.float32).unsqueeze(0)
-preds = []
-for _ in range(5):
-    with torch.no_grad():
-        p = model(seq).item()
-        preds.append(p)
-        seq = torch.cat([seq[:, 1:, :], torch.tensor([[[p]]])], dim=1)
-
-# Inverse scale
-preds = scaler.inverse_transform(np.array(preds).reshape(-1, 1))
-print("Next 5 LTP predictions:")
-print(preds.flatten())
+print("Next 5 predictions:", predictions)
