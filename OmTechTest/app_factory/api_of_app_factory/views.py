@@ -19,8 +19,19 @@ from .serializers import (
 class CementFactory_LC(generics.ListCreateAPIView):
     queryset = CementFactoryInfo.objects.all()
     serializer_class = CementFactorySerializer
-    pass 
+
 
 class CementFactory_Detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CementFactoryInfo.objects.all()
     serializer_class = CementFactorySerializer
+
+
+class NewsSection_LC(generics.ListCreateAPIView):
+    queryset = NewsSectionInfo.objects.all()
+    serializer_class = NewsSectionSerializer
+    
+
+class NewsSection_Detail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = NewsSectionInfo.objects.all()
+    serializer_class = NewsSectionSerializer
+
