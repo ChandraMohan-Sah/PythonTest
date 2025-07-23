@@ -9,4 +9,7 @@ urlpatterns = [
     path('news-section-lc/', views.NewsSection_LC.as_view(), name="news-section-lc"),
     path('news-section-detail/<int:pk>/', views.NewsSection_Detail.as_view(), name="news-section-detail"),
 
+    path('price-history-lc/',views.PriceHistory_LC.as_view(), name='price-history-lc'),
+    path('price-history-detail/<int:pk>/', views.PriceHistory_Detail.as_view(), name='price-history-detail')
+
 ]

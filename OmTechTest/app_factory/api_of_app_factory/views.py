@@ -35,3 +35,10 @@ class NewsSection_Detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = NewsSectionInfo.objects.all()
     serializer_class = NewsSectionSerializer
 
+class PriceHistory_LC(generics.ListCreateAPIView):
+    queryset = PriceHistoryInfo.objects.all()
+    serializer_class = PriceHistorySerializer 
+
+class PriceHistory_Detail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PriceHistoryInfo.objects.all()
+    serializer_class = PriceHistorySerializer 
